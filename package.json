@@ -5,6 +5,7 @@
     "fs": "^0.0.1-security"
   },
   "devDependencies": {
+    "@types/ffmpeg": "^1.0.7",
     "@types/node": "^20.12.12"
   }
 }

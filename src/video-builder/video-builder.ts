@@ -12,11 +12,13 @@ export class VideoBuilder {
 
     async addSource(source: VideoSpecSource): Promise<void> {
         this.sources.push(await sourceLoader.load(
-            source.type,
-            source.src,
-            `.tmp/${source.name}`, // TODO: improve name
-            this.fps,
-        ));
+            source.type, {
+            src: source.src,
+            out: `.tmp/${source.name}`, // TODO: improve name
+            fps: this.fps,
+            layout: source.layout,
+            transformations: source.transform,
+        }));
     }
 
     async build(): Promise<void> {
