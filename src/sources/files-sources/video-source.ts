@@ -1,6 +1,6 @@
 import { FfmpegFrameExtractor } from "../../lib/ffmpg-frame-extractor";
 import { VideoSpecLayout, VideoSpecTransform } from "../../types";
-import { Source, SourceProps, SourceType } from "../source";
+import { FrameFormat, Source, SourceProps, SourceType } from "../source";
 
 
 export class VideoSource implements Source {
@@ -24,8 +24,8 @@ export class VideoSource implements Source {
         })
     }
 
-    getFrameN(n: number, format: string = "png"): Promise<Buffer | null> {
-        return this.framesExtractor.getFrameN(n)
+    getFrameN(n: number, format: FrameFormat = "png"): Promise<Buffer | null> {
+        return this.framesExtractor.getFrameN(n, format)
             .catch((err) => {
                 console.error(`Error getting frame ${n} from ${this.srcPath}: ${err}`)
                 return null

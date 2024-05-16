@@ -1,3 +1,4 @@
+import { FormatEnum } from "sharp"
 import { VideoSpecLayout, VideoSpecTransform } from "../types"
 
 export enum SourceType {
@@ -12,6 +13,7 @@ export interface SourceProps {
     transformations: VideoSpecTransform[]
 }
 
+export type FrameFormat = keyof FormatEnum
 
 // Essentially a reference to a source of data that holds frames, audio, layout, etc
 export abstract class Source {
@@ -22,7 +24,7 @@ export abstract class Source {
     abstract transformations: VideoSpecTransform[]
 
     abstract getTotalFrames(): number
-    abstract getFrameN(n: number, format?: string): Promise<Buffer | null>
+    abstract getFrameN(n: number, format?: FrameFormat): Promise<Buffer | null>
 
     abstract getAudio(): Promise<Buffer | null>
 

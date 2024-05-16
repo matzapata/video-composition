@@ -1,8 +1,9 @@
 import { SourceType } from "./sources/source"
+import { TransformationData } from "./transformations/transformation"
 
 export interface VideoSpecTransform {
     type: string,
-    data: any, // TODO: add types
+    data: TransformationData, 
 }
 
 export interface VideoSpecLayout {

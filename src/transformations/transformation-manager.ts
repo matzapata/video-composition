@@ -1,8 +1,7 @@
 import { ZoomStrategy } from "./strategies/zoom-strategy";
 import { CropStrategy } from "./strategies/crop-strategy";
-import { FrameTransformationStrategy, TransformationType } from "./transformation";
-import { Source } from "../sources/source";
-import { SourcesFactory } from "../sources/source-factory";
+import { FrameTransformationStrategy, TransformationCtx, TransformationType } from "./transformation";
+import { VideoSpecTransform } from "../types";
 
 class TransformationsManager {
 
@@ -10,19 +9,13 @@ class TransformationsManager {
         [key in TransformationType]: FrameTransformationStrategy
     }) {}
 
-   async  apply(buffer: Buffer, frameN: number, transformations: any[]): Promise<Buffer> {
-       // TODO: Implement a better path generation
+   async  apply(frame: Buffer, transformations: VideoSpecTransform[], ctx?: TransformationCtx): Promise<Buffer> {
+        for (const transformation of transformations) {
+            const strategy = this.strategies[transformation.type as TransformationType]
+            frame = await strategy.apply(frame, transformation.data, ctx)
+        }
 
-        // TODO: use promise.all
-        // apply transformations per frame and store in outPath
-        // for (const frame of source.getFrames()) {
-        //     for (const transformation of source.transformations) {
-        //         const strategy = this.strategies[transformation.type as TransformationType]
-        //         await strategy.apply(frame, outPath, transformation.data)
-        //     }
-        // }
-
-        throw new Error("Method not implemented.");
+        return frame
     }
 
 }

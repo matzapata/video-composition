@@ -1,6 +1,6 @@
-import { readFileSync } from "fs";
 import { VideoSpecLayout, VideoSpecTransform } from "../../types";
-import { Source, SourceProps, SourceType } from "../source";
+import { FrameFormat, Source, SourceProps, SourceType } from "../source";
+import sharp from "sharp";
 
 
 export class ImageSource implements Source {
@@ -10,22 +10,18 @@ export class ImageSource implements Source {
     layout: VideoSpecLayout | null
     transformations: VideoSpecTransform[];
 
-    image: Buffer
-
     constructor(props: SourceProps) {
         this.srcPath = props.srcPath;
         this.layout = props.layout;
         this.transformations = props.transformations;
         this.fps = props.fps
-
-        this.image = readFileSync(this.srcPath)
     }
 
-    getFrameN(frame: number, format: string = "png"): Promise<Buffer | null> {
-        // TODO: implement different formats
+    getFrameN(frame: number, format: FrameFormat = "png"): Promise<Buffer | null> {
+        
 
         // not a function of frame
-        return Promise.resolve(this.image)
+        return sharp(this.srcPath).toFormat(format).toBuffer()
     }
 
     getTotalFrames(): number { 
