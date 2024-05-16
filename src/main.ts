@@ -1,29 +1,24 @@
+import { writeFileSync } from "fs";
 import { SourceType } from "./sources/source";
-import { sourceLoader } from "./sources/source-loader";
+import { SourcesFactory } from "./sources/source-factory";
+import path from "path";
 
+// TODO: manage uniform file format
 
-// load image
-// sourceLoader.load(SourceType.IMAGE, {
-//     src: "../tests/image.png", 
-//     out: "../tests/frames", 
-//     fps: 32,
-//     layout: {x: 0, y: 0, width: 32, height: 32},
-//     transformations: []
-// }).then((source) => {
-//     console.log(source);
-// }).catch((err) => {
-//     console.error(err);
-// })
+const srcPath = path.join(__dirname, '../tests/movie.mp4');
 
-//  load video
-// sourceLoader.load(SourceType.VIDEO, {
-//     src: "../tests/movie.mp4", 
-//     out: "../tests/frames", 
-//     fps: 32,
-//     layout: {x: 0, y: 0, width: 32, height: 32},
-//     transformations: []
-// }).then((source) => {
-//     console.log(source);
-// }).catch((err) => {
-//     console.error(err);
-// })
+const src = SourcesFactory.create(SourceType.VIDEO, {
+    fps: 32,
+    layout: { x: 0, y: 0, width: 1920, height: 1080 },
+    srcPath:srcPath ,
+    transformations: []
+})
+
+src.getFrameN(10).then((frame) => {
+    // write to test.png
+    if (!frame) {
+        console.error('Frame is null')
+        return
+    }
+    writeFileSync('test.jpg', frame)
+})

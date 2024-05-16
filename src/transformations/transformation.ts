@@ -7,5 +7,5 @@ export enum TransformationType {
 export abstract class FrameTransformationStrategy {
     abstract type: TransformationType
 
-    abstract apply(src: string, dst: string, data: any): Promise<void>
+    abstract apply(src: Buffer, data: any): Promise<Buffer>
 }

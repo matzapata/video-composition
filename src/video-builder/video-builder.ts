@@ -1,9 +1,9 @@
 import { Source } from "../sources/source";
+import { SourcesFactory } from "../sources/source-factory";
 import { transformationsManager } from "../transformations/transformation-manager";
 import { VideoSpecSource } from "../types";
 import { createCanvas, loadImage } from "canvas";
 import { writeFileSync } from "fs";
-import { sourceLoader } from "../sources/source-loader";
 
 export class VideoBuilder {
     private sources: Source[] = [];
@@ -11,32 +11,31 @@ export class VideoBuilder {
     constructor(private fps: number, private duration: number, private width: number, private height: number) { }
 
     async addSource(source: VideoSpecSource): Promise<void> {
-        this.sources.push(await sourceLoader.load(
-            source.type, {
-            src: source.src,
-            out: `.tmp/${source.name}`, // TODO: improve name
+        this.sources.push(await SourcesFactory.create(source.type, {
             fps: this.fps,
+            srcPath: source.src,
             layout: source.layout,
             transformations: source.transform,
         }));
     }
 
     async build(): Promise<void> {
-        // Apply transformations to sources
-        const transformedSources = await Promise.all(
-            this.sources.map(source => transformationsManager.apply(source))
-        );
 
-        // render in canvas
+        // TODO: change, iterate over total number of frames
         for (let frame_n = 0; frame_n < this.duration * this.fps; frame_n++) {
             const frame = createCanvas(this.width, this.height)
             const ctx = frame.getContext('2d');
 
-            for (const source of transformedSources) {
-                const image = await loadImage(source.getFrame(frame_n));
-                const layout = source.getLayout();
-                ctx.drawImage(image, layout.x, layout.y, layout.width, layout.height);
-            }
+            // TODO: for source of sources
+            // TODO: get frame at frame_n
+            // TODO: transform
+            // TODO: draw
+
+            // for (const source of transformedSources) {
+            //     const image = await loadImage(source.getFrame(frame_n));
+            //     const layout = source.getLayout();
+            //     ctx.drawImage(image, layout.x, layout.y, layout.width, layout.height);
+            // }
 
             // save to file
             const buf = frame.toBuffer();

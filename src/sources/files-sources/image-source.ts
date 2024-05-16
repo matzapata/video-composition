@@ -1,37 +1,44 @@
+import { readFileSync } from "fs";
 import { VideoSpecLayout, VideoSpecTransform } from "../../types";
-import { Source, SourceType } from "../source";
+import { Source, SourceProps, SourceType } from "../source";
 
 
 export class ImageSource implements Source {
-    type: SourceType
-    totalFrames: number
-    framesPath: string // where all the frames, audio, etc are stored
-    audioPath: string | null // audio path
+    type: SourceType.IMAGE = SourceType.IMAGE
+    srcPath: string
+    fps: number
     layout: VideoSpecLayout | null
     transformations: VideoSpecTransform[];
 
-    constructor(props: {
-        type: SourceType,
-        totalFrames: number,
-        framesPath: string,
-        audioPath: string | null,
-        layout: VideoSpecLayout ,
-        transformations: VideoSpecTransform[]
-    }) {
-        this.type = props.type;
-        this.totalFrames = props.totalFrames;
-        this.framesPath = props.framesPath;
-        this.audioPath = props.audioPath;
+    image: Buffer
+
+    constructor(props: SourceProps) {
+        this.srcPath = props.srcPath;
         this.layout = props.layout;
         this.transformations = props.transformations;
+        this.fps = props.fps
+
+        this.image = readFileSync(this.srcPath)
     }
 
-    getPath(): string { throw new Error("Method not implemented.") }
-    getFrame(frame: number): string { throw new Error("Method not implemented.") }
-    getFrames(): string[] { throw new Error("Method not implemented.") }
+    getFrameN(frame: number, format: string = "png"): Promise<Buffer | null> {
+        // TODO: implement different formats
 
-    getAudio(): string { throw new Error("Method not implemented.") }
-    getLayout(): any { throw new Error("Method not implemented.") }
+        // not a function of frame
+        return Promise.resolve(this.image)
+    }
+
+    getTotalFrames(): number { 
+        return 1;
+    }
+
+    getAudio(): Promise<Buffer | null> { 
+        return Promise.resolve(null);
+     }
+
+    getLayout(): VideoSpecLayout | null {
+        return this.layout
+    }
 
     getTransformations(): VideoSpecTransform[] {
         return this.transformations

@@ -4,7 +4,7 @@ import { FrameTransformationStrategy, TransformationType } from "../transformati
 export class CropStrategy implements FrameTransformationStrategy {
     type = TransformationType.CROP
 
-    apply(src: string, dst: string, data: any): Promise<void> {
+    apply(src: Buffer, data: any): Promise<Buffer> {
         throw new Error("Method not implemented.");
     }
 }

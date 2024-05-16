@@ -4,7 +4,7 @@ import { FrameTransformationStrategy, TransformationType } from "../transformati
 export class ZoomStrategy implements FrameTransformationStrategy {
     type = TransformationType.ZOOM
 
-    apply(src: string, dst: string, data: any): Promise<void> {
+    apply(src: Buffer, data: any): Promise<Buffer> {
         throw new Error("Method not implemented.");
     }
 }
