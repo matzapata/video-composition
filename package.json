@@ -2,7 +2,9 @@
   "dependencies": {
     "canvas": "^2.11.2",
     "ffmpeg": "^0.0.4",
-    "fs": "^0.0.1-security"
+    "fluent-ffmpeg": "^2.1.2",
+    "fs": "^0.0.1-security",
+    "sharp": "^0.33.3"
   },
   "devDependencies": {
     "@types/ffmpeg": "^1.0.7",

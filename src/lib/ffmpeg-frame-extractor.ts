@@ -47,6 +47,7 @@ export class FfmpegFrameExtractor {
                 '-f', 'image2pipe',
                 '-c:v', format,
                 'pipe:1',
+                "-hwaccel", "none",
                 '-y'
             ]);
 
@@ -54,16 +55,19 @@ export class FfmpegFrameExtractor {
 
             // Capture stdout data
             ffmpeg.stdout.on('data', (data) => {
+                console.log("OK")
                 frameBuffer = Buffer.concat([frameBuffer, data]);
             });
 
             // Capture stderr data
             ffmpeg.stderr.on('data', (data) => {
+                console.log("ERROR capturing frame")
                 console.error(`ffmpeg stderr: ${data}`);
             });
 
             // Capture error event
             ffmpeg.on('error', (error) => {
+                console.log("ERROR capturing frame")
                 console.error(`ffmpeg error: ${error.message}`);
             });
 

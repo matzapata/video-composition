@@ -4,27 +4,27 @@ import sharp from "sharp";
 
 
 export class ImageSource implements Source {
+    name: string;   
     type: SourceType.IMAGE = SourceType.IMAGE
     srcPath: string
     fps: number
-    layout: VideoSpecLayout | null
+    layout: VideoSpecLayout 
     transformations: VideoSpecTransform[];
 
     constructor(props: SourceProps) {
+        this.name = props.name
         this.srcPath = props.srcPath;
         this.layout = props.layout;
         this.transformations = props.transformations;
         this.fps = props.fps
     }
 
-    getFrameN(frame: number, format: FrameFormat = "png"): Promise<Buffer | null> {
-        
-
+    getFrameNumber(frame: number, format: FrameFormat = "png"): Promise<Buffer | null> {
         // not a function of frame
         return sharp(this.srcPath).toFormat(format).toBuffer()
     }
 
-    getTotalFrames(): number { 
+    getFramesCount(): number { 
         return 1;
     }
 
@@ -32,7 +32,7 @@ export class ImageSource implements Source {
         return Promise.resolve(null);
      }
 
-    getLayout(): VideoSpecLayout | null {
+    getLayout(): VideoSpecLayout {
         return this.layout
     }
 
