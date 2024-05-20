@@ -27,7 +27,7 @@ export class VideoSource implements Source {
     }
 
     getFrameNumber(n: number, format: FrameFormat = "png"): Promise<Buffer | null> {
-        return this.framesExtractor.getFrameN(n, format)
+        return this.framesExtractor.getFrameNumber(n, format)
             .catch((err) => {
                 console.error(`Error getting frame ${n} from ${this.srcPath}: ${err}`)
                 return null

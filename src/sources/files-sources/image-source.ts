@@ -10,6 +10,7 @@ export class ImageSource implements Source {
     fps: number
     layout: VideoSpecLayout 
     transformations: VideoSpecTransform[];
+    frame: Buffer | null = null
 
     constructor(props: SourceProps) {
         this.name = props.name
@@ -21,7 +22,21 @@ export class ImageSource implements Source {
 
     getFrameNumber(frame: number, format: FrameFormat = "png"): Promise<Buffer | null> {
         // not a function of frame
-        return sharp(this.srcPath).toFormat(format).toBuffer()
+        if (this.frame) {
+            return Promise.resolve(this.frame)
+        } 
+
+        return sharp(this.srcPath)
+            .toFormat(format)
+            .toBuffer()
+            .then((data) => {
+                this.frame = data
+                return data
+            })
+            .catch((err) => {
+                console.error(`Error getting frame from ${this.srcPath}: ${err}`)
+                return null
+            })
     }
 
     getFramesCount(): number { 

@@ -1,14 +1,11 @@
-import { writeFileSync } from "fs";
 import { SourceType } from "./sources/source";
-import { SourcesFactory } from "./sources/source-factory";
 import path from "path";
-import { transformationsManager } from "./transformations/transformation-manager";
 import { TransformationType } from "./transformations/transformation";
 import { VideoBuilder } from "./video-builder/video-builder";
 
-// TODO: manage uniform file format and paths
 
-const srcPath = path.join(__dirname, '../tests/movie.mp4');
+const screenVideoPath = path.join(__dirname, '../tests/movie.mp4');
+const bgImagePath = path.join(__dirname, '../tests/bg.jpg');
 
 const videoBuilder = new VideoBuilder({
     fps: 30,
@@ -17,42 +14,38 @@ const videoBuilder = new VideoBuilder({
     outputFile: 'output.mp4'
 })
 videoBuilder.addSource({
-    name: "screen",
+    name: "background",
     layout: { x: 0, y: 0, width: 1920, height: 1080 },
-    src: srcPath,
+    src: bgImagePath,
     transform: [],
+    type: SourceType.IMAGE
+})
+videoBuilder.addSource({
+    name: "screen",
+    layout: { x: 20, y: 20, width: 1420 - 40, height: 1080 - 40 },
+    src: screenVideoPath,
+    transform: [
+        {
+            type: TransformationType.CROP,
+            data: {
+                left: 500,
+                top: 500, 
+                width: 500,
+                height: 500
+            }
+        }, 
+        // {
+        //     type: TransformationType.ZOOM,
+        //     data: {
+        //         factor: 2,
+        //     }
+        // }
+    ],
     type: SourceType.VIDEO
 })
 
+
 videoBuilder.build().then(() => {
-    console.log('Video built')
+    console.log('Video built successfully')
+    process.exit(0)
 })
-
-// const src = SourcesFactory.create(SourceType.VIDEO, {
-//     fps: 32,
-//     layout: { x: 0, y: 0, width: 1920, height: 1080 },
-//     srcPath:srcPath ,
-//     transformations: []
-// })
-
-// src.getFrameNumber(10).then((frame) => {
-//     // write to test.png
-//     if (!frame) {
-//         console.error('Frame is null')
-//         return
-//     }
-//     transformationsManager.apply(frame, [
-//         {
-//             type: TransformationType.CROP,
-//             data: {
-//                 height: 100,
-//                 width: 100,
-//                 left: 0,
-//                 top: 0,
-//             }
-//         }
-
-//     ]).then((frame) => {
-//         writeFileSync('test.png', frame)
-//     })
-// })

@@ -1,6 +1,7 @@
 import { FfmpegVideoBuilder } from "../lib/ffmpeg-video-builder";
 import { Source } from "../sources/source";
 import { SourcesFactory } from "../sources/source-factory";
+import { transformationsManager } from "../transformations/transformation-manager";
 import { VideoSpecSource } from "../types";
 import { createCanvas, loadImage } from "canvas";
 
@@ -11,7 +12,7 @@ export class VideoBuilder {
     private outputFile: string;
     private sources: Source[] = [];
 
-    constructor(props: { width: number, height: number, fps: number, outputFile: string }) { 
+    constructor(props: { width: number, height: number, fps: number, outputFile: string }) {
         this.width = props.width;
         this.height = props.height;
         this.fps = props.fps;
@@ -29,6 +30,7 @@ export class VideoBuilder {
     }
 
     async build(): Promise<void> {
+        const time = Date.now();
         // start video building
         const video = new FfmpegVideoBuilder({
             fps: this.fps,
@@ -47,29 +49,37 @@ export class VideoBuilder {
         console.log('largestFramesCount', largestFramesCount);
 
 
+        const frame = createCanvas(this.width, this.height)
+        const ctx = frame.getContext('2d');
+
         // for each frame transform and draw all sources
         for (let frameN = 0; frameN < largestFramesCount; frameN++) {
-            const frame = createCanvas(this.width, this.height)
-            const ctx = frame.getContext('2d');
+            const ft = Date.now();
 
             for (const source of this.sources) {
                 const sourceFrame = await source.getFrameNumber(frameN);
                 if (!sourceFrame) {
-                    console.log('sourceFrame is null', source.name);
+                    console.error('SourceFrame is null', source.name);
                     continue;
                 }
 
-                // TODO: apply transformations
+                // apply transformations to source
+                const transformedFrame = await transformationsManager.apply(sourceFrame, source.getTransformations())
 
-                const image = await loadImage(sourceFrame);
+                const image = await loadImage(transformedFrame);
                 const layout = source.getLayout();
                 ctx.drawImage(image, layout.x, layout.y, layout.width, layout.height);
             }
 
             // Add frame to video
-            video.addFrame(frame.toBuffer());
+            video.addFrame(frame.toBuffer('image/jpeg'));
+            console.log(`frame ${frameN} took ${Date.now() - ft} ms to process`);
         }
 
-        video.end();
+
+
+        console.log('Video built in', (Date.now() - time) / 1000, 'segs');
+        await video.end();
+        console.log('Video built in', (Date.now() - time) / 1000, 'segs');
     }
 }
