@@ -4,6 +4,7 @@
     "ffmpeg": "^0.0.4",
     "fluent-ffmpeg": "^2.1.2",
     "fs": "^0.0.1-security",
+    "rimraf": "^5.0.7",
     "sharp": "^0.33.3"
   },
   "devDependencies": {
