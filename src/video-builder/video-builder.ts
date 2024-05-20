@@ -40,14 +40,11 @@ export class VideoBuilder {
         });
 
         // get largest frame size
-        console.log('sources', this.sources);
         const largestFramesCount = this.sources.reduce((prev, curr) => {
             const totalFrames = curr.getFramesCount();
             console.log('totalFrames', totalFrames);
             return Math.max(prev, totalFrames);
         }, 0);
-        console.log('largestFramesCount', largestFramesCount);
-
 
         const frame = createCanvas(this.width, this.height)
         const ctx = frame.getContext('2d');
@@ -56,20 +53,53 @@ export class VideoBuilder {
         for (let frameN = 0; frameN < largestFramesCount; frameN++) {
             const ft = Date.now();
 
-            for (const source of this.sources) {
+            const transformedFrames = await Promise.all(this.sources.map(async (source) => {
                 const sourceFrame = await source.getFrameNumber(frameN);
                 if (!sourceFrame) {
                     console.error('SourceFrame is null', source.name);
-                    continue;
+                    return { image: null, layout: source.getLayout() };
                 }
 
                 // apply transformations to source
                 const transformedFrame = await transformationsManager.apply(sourceFrame, source.getTransformations())
 
-                const image = await loadImage(transformedFrame);
-                const layout = source.getLayout();
+                return { image: await loadImage(transformedFrame), layout: source.getLayout() }
+            }))
+
+            // sort by z-index
+            transformedFrames.sort((a, b) => (a.layout.zIndex ?? 0) - (b.layout.zIndex ?? 0));
+
+            // draw all sources on frame
+            transformedFrames.forEach(({ image, layout }) => {
+                if (!image) {
+                    return;
+                }
+
+                const borderRadius = layout.borderRadius ?? 0;
+                const borderWidth = layout.borderWidth ?? 0;
+                const borderColor = layout.borderColor ?? 'transparent';
+
+                // create layout
+                ctx.strokeStyle = borderColor;
+                ctx.lineWidth = borderWidth; 
+                ctx.beginPath();
+                ctx.moveTo(layout.x + borderRadius, layout.y);
+                ctx.lineTo(layout.x + layout.width - borderRadius, layout.y);
+                ctx.quadraticCurveTo(layout.x + layout.width, layout.y, layout.x + layout.width, layout.y + borderRadius);
+                ctx.lineTo(layout.x + layout.width, layout.y + layout.height - borderRadius);
+                ctx.quadraticCurveTo(layout.x + layout.width, layout.y + layout.height, layout.x + layout.width - borderRadius, layout.y + layout.height);
+                ctx.lineTo(layout.x + borderRadius, layout.y + layout.height);
+                ctx.quadraticCurveTo(layout.x, layout.y + layout.height,layout.x, layout.y + layout.height - borderRadius);
+                ctx.lineTo(layout.x, layout.y + borderRadius);
+                ctx.quadraticCurveTo(layout.x, layout.y, layout.x + borderRadius, layout.y);
+                ctx.closePath();
+                ctx.stroke()
+                
+                // Draw the image inside the layout
+                ctx.clip();
                 ctx.drawImage(image, layout.x, layout.y, layout.width, layout.height);
-            }
+                ctx.restore();
+            });
 
             // Add frame to video
             video.addFrame(frame.toBuffer('image/jpeg'));

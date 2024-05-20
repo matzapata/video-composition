@@ -11,6 +11,10 @@ export interface VideoSpecLayout {
     y: number,
     width: number,
     height: number,
+    borderRadius?: number,
+    borderWidth?: number,
+    borderColor?: string,
+    zIndex?: number,
 }
 
 export interface VideoSpecSource {

@@ -15,14 +15,22 @@ const videoBuilder = new VideoBuilder({
 })
 videoBuilder.addSource({
     name: "background",
-    layout: { x: 0, y: 0, width: 1920, height: 1080 },
+    layout: { x: 0, y: 0, width: 1920, height: 1080, zIndex: 10 },
     src: bgImagePath,
     transform: [],
     type: SourceType.IMAGE
 })
 videoBuilder.addSource({
     name: "screen",
-    layout: { x: 20, y: 20, width: 1420 - 40, height: 1080 - 40 },
+    layout: { 
+        x: 20, 
+        y: 20, 
+        width: 1420 - 40, 
+        height: 1080 - 40, 
+        borderColor: 'red',
+        borderRadius: 20,
+        borderWidth: 10,
+    },
     src: screenVideoPath,
     transform: [
         {

@@ -4,9 +4,11 @@
 
 - Add audio to video
 - Preserve image aspect radio
-- Rounded border in image
-- Create example layouts
-- 
+- Create example layouts -> functions that create config objects 
+- Zoom animation
+- Manage videos with different lengths appropriately
+- Add flexibility around loading, don't use temp folder, use known folder, maybe in temp directory but that you can reuse. 
+- CLI 
 
 # Setup
 
